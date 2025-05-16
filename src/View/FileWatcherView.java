@@ -67,6 +67,8 @@ public final class FileWatcherView implements PropertyChangeListener{
     private final JMenuItem stopMenuItem;
     private final JMenuItem QueryMenuItem;
     private final JMenuItem closeMenuItem;
+    private final JMenu helpMenu;
+
 
 
     /*
@@ -83,6 +85,8 @@ public final class FileWatcherView implements PropertyChangeListener{
     public FileWatcherView() {
       submitButton = new JButton("Submit");
         mainFrame = new JFrame(WINDOW_TITLE); //create a new JFrame Object(frame from field)
+        mainFrame.setSize(GUI_DIMENSION);
+        mainFrame.setLocationRelativeTo(null);
       //Initializes fileEventList and sets its selection mode.
         fileEventList = new JList<>(new String[] {
                 "Sample file that exceeds viewport width", "Another long event string",
@@ -124,6 +128,9 @@ public final class FileWatcherView implements PropertyChangeListener{
         startButton.setEnabled(true);
         stopButton.setEnabled(false);
 
+        //Jmenu bar
+        helpMenu = new JMenu("Help");
+
         initComponents();
 
     }
@@ -131,22 +138,6 @@ public final class FileWatcherView implements PropertyChangeListener{
     public void initComponents() {
         // Set layout for main frame
         mainFrame.setLayout(new BorderLayout());
-
-//        // Create menu bar
-//        JMenu fileMenu = new JMenu("File");
-//        fileMenu.add(startMenuItem);
-//        fileMenu.add(stopMenuItem);
-//        fileMenu.add(QueryMenuItem);
-//        fileMenu.add(closeMenuItem);
-//
-//
-//        JMenu editMenu = new JMenu("Edit");
-//        JMenu helpMenu = new JMenu("Help");
-//
-//        menuBar.add(fileMenu);
-//        menuBar.add(editMenu);
-//        menuBar.add(helpMenu);
-
         mainFrame.setJMenuBar(this.menuBar);
 
         // Create form panel (top section)
@@ -221,16 +212,90 @@ public final class FileWatcherView implements PropertyChangeListener{
         mainFrame.add(tablePanel, BorderLayout.CENTER);
 
         // Set frame properties
+
+
+
+//        // property change list for start button
+//        startButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
+//            @Override
+//            public void propertyChange(PropertyChangeEvent e){
+//                System.out.println(" " + e.getNewValue());
+//            }
+//        });
+//
+//        // property change list for start button
+//        stopButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
+//            @Override
+//            public void propertyChange(PropertyChangeEvent e){
+//                System.out.println(" " + e.getNewValue());
+//            }
+//        });
+//
+//        // Action listeners for start button
+//        startButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                System.out.println("Started");
+//                startButton.setEnabled(false);
+//                stopButton.setEnabled(true);startButton.setEnabled(false);
+//                startMenuItem.setEnabled(false);
+//                stopMenuItem.setEnabled(true);
+//            }
+//        });
+//
+//        // Action listeners for stop button
+//        stopButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                System.out.println("Stoped");
+//
+//
+//                startButton.setEnabled(true);
+//                stopButton.setEnabled(false);
+//                startMenuItem.setEnabled(true);
+//                stopMenuItem.setEnabled(false);
+//            }
+//        });
+//        // property change list for submit button
+//        submitButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
+//            @Override
+//            public void propertyChange(PropertyChangeEvent e){
+//                System.out.println(" " + e.getNewValue());
+//            }
+//        });
+//
+//        // Action listeners for submit button
+//        submitButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                System.out.println("Submit");
+//                //stopButton.setEnabled(false);
+//                //startButton.setEnabled(true);
+//            }
+//        });
+
+        // Listener for selection change
+        extensionDropdown.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String selectedType = (String) extensionDropdown.getSelectedItem();
+                System.out.println(selectedType);
+            }
+        });
+        fileJMenuItem();
+        menuBarJMenuItem();
+        editMenuJMenuItem();
+        collectActionPerformed();
         mainFrame.setSize(GUI_DIMENSION);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         mainFrame.setVisible(true);
+        //mainFrame.pack();
         mainFrame.revalidate();
         mainFrame.repaint();
         System.out.println("Frame contents: " + Arrays.toString(mainFrame.getContentPane().getComponents()));
         System.out.println("Table panel contents: " + Arrays.toString(tablePanel.getComponents()));
 
+    }
 
 
+    //helper function for Actionlistener(submit, stop, start)
+    public void collectActionPerformed(){
         // property change list for start button
         startButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
             @Override
@@ -251,10 +316,8 @@ public final class FileWatcherView implements PropertyChangeListener{
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Started");
-//
                 startButton.setEnabled(false);
                 stopButton.setEnabled(true);startButton.setEnabled(false);
-//                stopButton.setEnabled(true);
                 startMenuItem.setEnabled(false);
                 stopMenuItem.setEnabled(true);
             }
@@ -264,8 +327,6 @@ public final class FileWatcherView implements PropertyChangeListener{
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Stoped");
-//                stopButton.setEnabled(false);
-//                startButton.setEnabled(true);
 
                 startButton.setEnabled(true);
                 stopButton.setEnabled(false);
@@ -295,12 +356,49 @@ public final class FileWatcherView implements PropertyChangeListener{
             public void actionPerformed(ActionEvent e) {
                 String selectedType = (String) extensionDropdown.getSelectedItem();
                 System.out.println(selectedType);
-               // extensionDropdown.setPrototypeDisplayValue("Selected file type: " + selectedType);
             }
         });
-        fileJMenuItem();
-        menuBarJMenuItem();
     }
+
+    //helper function for JMenuItem (Help-> item->contact Us)
+    public void editMenuJMenuItem() {
+        JMenuItem contactUs = new JMenuItem("Contact Us");
+        helpMenu.add(contactUs);
+        JDialog dialog = new JDialog(mainFrame, "Contact Us", false);
+        dialog.setLayout(new GridLayout(1, 2));
+
+        String content = """
+                <html>
+                <div style='text-align: center;'>
+                    <br><br><br><br>
+                    Name: John Smith<br>
+                    Email: help@example.com<br>
+                    Phone: +1-123-456-7890
+                </div>
+                </html>
+                """;
+
+        JLabel label = new JLabel(content, SwingConstants.CENTER); // Centers content horizontally
+        label.setVerticalAlignment(SwingConstants.CENTER);         // Centers content vertically
+
+        Image image = new ImageIcon(ICON_PATH).getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+        JLabel icon = new JLabel(new ImageIcon(image));
+
+        dialog.add(icon);
+        dialog.add(label);
+
+        // Action listeners for submit button
+        contactUs.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                dialog.setSize(mainFrame.getSize().width/ 2, mainFrame.getSize().height/ 2);
+                dialog.setLocationRelativeTo(mainFrame);
+                System.out.println("Contact Us"); //for test
+                dialog.setVisible(true);
+
+            }
+        });
+    }
+//new ImageIcon(ICON_PATH)
 
 
     //helper function for JMenubar
@@ -315,13 +413,12 @@ public final class FileWatcherView implements PropertyChangeListener{
 
 
         JMenu editMenu = new JMenu("Edit");
-        JMenu helpMenu = new JMenu("Help");
+        //JMenu helpMenu = new JMenu("Help");
 
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
         menuBar.add(helpMenu);
     }
-
 
 
     //helper function for file JMenuItem
@@ -397,6 +494,18 @@ public final class FileWatcherView implements PropertyChangeListener{
 
     }
 
+    /*
+
+    public void actionPerformed(ActionEvent e)
+    {
+        String s = e.getActionCommand();
+        if (s.equals("click")) {
+            // create a dialog Box
+            JDialog d = new JDialog(f, "dialog Box");
+
+            // create a label
+
+     */
 
     @java.lang.Override
     public void propertyChange(java.beans.PropertyChangeEvent evt) {
