@@ -1,6 +1,8 @@
 package View;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.BadLocationException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.*;
@@ -45,7 +47,7 @@ public final class FileWatcherView implements PropertyChangeListener{
      */
     public static final String WINDOW_TITLE = "File Watcher";
 
-    private final JFrame mainFrame;
+    protected final JFrame mainFrame;
     private final JComboBox extensionSelector;
     private final JTextField directySelector;
     private final JMenuBar menuBar;
@@ -71,14 +73,6 @@ public final class FileWatcherView implements PropertyChangeListener{
 
 
 
-    /*
-
-      fileMenu.add(new JMenuItem("Start"));
-        fileMenu.add(new JMenuItem("Stop"));
-        fileMenu.add(new JMenuItem("Query Database(file extension)"));
-        fileMenu.add(new JMenuItem("Close"));
-     */
-
     /**
      * The constructor.
      */
@@ -92,11 +86,17 @@ public final class FileWatcherView implements PropertyChangeListener{
                 "Sample file that exceeds viewport width", "Another long event string",
                 "File type: .txt", "Path: /this/is/a/long/path/to/a/file.txt"
         });//(information)test database for scrollbar work.
+
         fileEventList.setFixedCellWidth(JFRAME_WIDTH + 1000); // Exceeds the viewport width
 
         // Initialize JComboBox
         extensionSelector = new JComboBox<>(commonExtensions); // () may have file name late
         directySelector = new JTextField();
+        try {
+            directySelector.getDocument().insertString(0,"C:\\",null);
+        } catch (BadLocationException e) {
+            throw new RuntimeException(e);
+        }
         this.menuBar = new JMenuBar();
        startButton = new JButton("start"); // check the gray and work color late
         stopButton = new JButton("stop");  // check the gray and work color late
@@ -193,16 +193,36 @@ public final class FileWatcherView implements PropertyChangeListener{
         JPanel tablePanel = new JPanel(new BorderLayout());
         tablePanel.setBorder(BorderFactory.createTitledBorder("File Watcher View:"));
 
-        // Create column headers for the JList
-        String[] columnNames = {"Row", "Extension", "Filename", "PATH", "Event"};
-        JPanel headerPanel = new JPanel(new GridLayout(1, columnNames.length));
-        for (String columnName : columnNames) {
-            headerPanel.add(new JLabel(columnName));
-        }
-        tablePanel.add(headerPanel, BorderLayout.NORTH);
+        // Initialize the table model with column headers and no initial rows
+        DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
+        // Add test data to the table model
+        tableModel.addRow(new Object[]{1, ".txt", "notes.txt", "/documents/work", "Created", "2023-10-15 10:15:00"});
+        tableModel.addRow(new Object[]{2, ".java", "Main.java", "/projects/code", "Modified", "2023-10-15 12:30:00"});
+        tableModel.addRow(new Object[]{3, ".html", "index.html", "/websites/home", "Deleted", "2023-10-14 09:00:00"});
+        tableModel.addRow(new Object[]{4, ".css", "styles.css", "/websites/design", "Created", "2023-10-14 11:00:00"});
+        tableModel.addRow(new Object[]{5, ".js", "script.js", "/websites/scripts", "Accessed", "2023-10-13 14:00:00"});
+        tableModel.addRow(new Object[]{6, ".pdf", "paper.pdf", "/documents/research", "Archived", "2023-10-12 18:45:00"});
+
+        // Create a JTable using the table model
+        JTable table = new JTable(tableModel);
+
+        // Prevent the table from resizing columns to fit within the viewport
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto-resizing of columns
+
+        // Set preferred column widths to exceed the viewport width
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);  // Row
+        table.getColumnModel().getColumn(1).setPreferredWidth(150); // Extension
+        table.getColumnModel().getColumn(2).setPreferredWidth(300); // Filename
+        table.getColumnModel().getColumn(3).setPreferredWidth(400); // PATH
+        table.getColumnModel().getColumn(4).setPreferredWidth(200); // Event
+        table.getColumnModel().getColumn(5).setPreferredWidth(250); // Date/Time
+
+
+        // Wrap the table in a JScrollPane to enable scrolling
+        JScrollPane scrollPane = new JScrollPane(table);
 
         // Add JList with scroll pane
-        JScrollPane scrollPane = new JScrollPane(fileEventList);
+        //JScrollPane scrollPane = new JScrollPane(fileEventList);
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 
         tablePanel.add(scrollPane, BorderLayout.CENTER);
@@ -212,64 +232,6 @@ public final class FileWatcherView implements PropertyChangeListener{
         mainFrame.add(tablePanel, BorderLayout.CENTER);
 
         // Set frame properties
-
-
-
-//        // property change list for start button
-//        startButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-//            @Override
-//            public void propertyChange(PropertyChangeEvent e){
-//                System.out.println(" " + e.getNewValue());
-//            }
-//        });
-//
-//        // property change list for start button
-//        stopButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-//            @Override
-//            public void propertyChange(PropertyChangeEvent e){
-//                System.out.println(" " + e.getNewValue());
-//            }
-//        });
-//
-//        // Action listeners for start button
-//        startButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Started");
-//                startButton.setEnabled(false);
-//                stopButton.setEnabled(true);startButton.setEnabled(false);
-//                startMenuItem.setEnabled(false);
-//                stopMenuItem.setEnabled(true);
-//            }
-//        });
-//
-//        // Action listeners for stop button
-//        stopButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Stoped");
-//
-//
-//                startButton.setEnabled(true);
-//                stopButton.setEnabled(false);
-//                startMenuItem.setEnabled(true);
-//                stopMenuItem.setEnabled(false);
-//            }
-//        });
-//        // property change list for submit button
-//        submitButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-//            @Override
-//            public void propertyChange(PropertyChangeEvent e){
-//                System.out.println(" " + e.getNewValue());
-//            }
-//        });
-//
-//        // Action listeners for submit button
-//        submitButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Submit");
-//                //stopButton.setEnabled(false);
-//                //startButton.setEnabled(true);
-//            }
-//        });
 
         // Listener for selection change
         extensionDropdown.addActionListener(new ActionListener() {
@@ -292,6 +254,7 @@ public final class FileWatcherView implements PropertyChangeListener{
         System.out.println("Table panel contents: " + Arrays.toString(tablePanel.getComponents()));
 
     }
+
 
 
     //helper function for Actionlistener(submit, stop, start)
@@ -359,6 +322,8 @@ public final class FileWatcherView implements PropertyChangeListener{
             }
         });
     }
+
+
 
     //helper function for JMenuItem (Help-> item->contact Us)
     public void editMenuJMenuItem() {
@@ -476,6 +441,7 @@ public final class FileWatcherView implements PropertyChangeListener{
                 System.out.println("Query Database(file extension)");
                 QueryMenuItem.setEnabled(false);// will see
                 QueryMenuItem.setEnabled(true); // will see
+                showQueryDialog();
             }
         });
 
@@ -491,7 +457,7 @@ public final class FileWatcherView implements PropertyChangeListener{
         });
     }
     public void showQueryDialog(){
-
+        QueryView queryView = new QueryView(this);
     }
 
     /*
@@ -508,7 +474,18 @@ public final class FileWatcherView implements PropertyChangeListener{
      */
 
     @java.lang.Override
-    public void propertyChange(java.beans.PropertyChangeEvent evt) {
-
+    public void propertyChange(PropertyChangeEvent evt) {
+        String name = evt.getPropertyName();
+        switch (name){
+            case "fileEventAdded":
+            System.out.println("fileEventAdded");
+            break;
+            case "fileEventsCleared":
+                System.out.println("fileEventsCleared");
+            break;
+        }
     }
 }
+
+
+
