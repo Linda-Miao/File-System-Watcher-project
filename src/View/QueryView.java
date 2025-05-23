@@ -3,18 +3,37 @@ package View;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
 
 public class QueryView {
 
     private final JButton submitButton;
     private final JTextField extensionTextField;
     private final JList<String> fileEventList;
+    private JDialog queryDialog;
+    private DefaultTableModel tableModel;
+
+    // add it for user instruction
+    private JLabel statusLabel;
+
     public QueryView(FileWatcherView watcherView){
         // Create a new dialog window for the query form
-        JDialog queryDialog = new JDialog(watcherView.mainFrame, "QueryForm");
-
+        queryDialog = new JDialog(watcherView.mainFrame, "QueryForm");
         // Create a label for the extension field with a helpful hint
         JLabel extensionLabel = new JLabel("Extension: (empty = ALL files)");
+
+//        // it is for instruction for user
+//        statusLabel = new JLabel("Enter extension and click Submit to search");
+//        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.ITALIC, 10f));
+//        statusLabel.setForeground(Color.BLUE);
+//        // Add to table panel at the bottom:
+//        tablePanel.add(statusLabel, BorderLayout.SOUTH);
+//
+
+
+
 
         // Use GridBagLayout to control the layout of the dialog components
         queryDialog.setLayout(new GridBagLayout());
@@ -31,7 +50,8 @@ public class QueryView {
         JPanel tablePanel = new JPanel(new BorderLayout());
 
         // Initialize the table model with column headers and no initial rows
-        DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
+        //DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
+        tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
         // Add test data to the table model
         tableModel.addRow(new Object[]{1, ".txt", "notes.txt", "/documents/work", "Created", "2023-10-15 10:15:00"});
         tableModel.addRow(new Object[]{2, ".java", "Main.java", "/projects/code", "Modified", "2023-10-15 12:30:00"});
@@ -114,6 +134,28 @@ public class QueryView {
         gbc.weighty = 0.85;      // 85% height
         queryDialog.add(tablePanel, gbc);
 
+       // to add label for the instruction for use how can use the file extension.
+        JLabel instructionLabel = new JLabel("Please enter file extension to filter results (e.g.,pdf,txt,jpg,,erl,java)");
+        instructionLabel.setFont(instructionLabel.getFont().deriveFont(Font.ITALIC, 11f));
+        instructionLabel.setForeground(Color.GRAY);
+        // Add to form panel at (0, 0) - push other components down
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 2; // Span across both columns
+        formPanel.add(instructionLabel, gbc);
+        // Then adjust existing components:
+        gbc.gridwidth = 1; // Reset to single column
+        gbc.gridy = 1; // Move extension label to row 1
+        formPanel.add(extensionLabel, gbc);
+        gbc.gridy = 2; // Move text field and button to row 2
+        // Add this before creating the table:
+        JLabel resultsLabel = new JLabel("Query Results:");
+        resultsLabel.setFont(resultsLabel.getFont().deriveFont(Font.BOLD, 12f));
+        // Add to table panel at the top:
+        tablePanel.add(resultsLabel, BorderLayout.NORTH);
+        tablePanel.add(scrollPane, BorderLayout.CENTER);
+
+
 
         /* Query data dialog */
         // Set the dimensions of the dialog relative to the main frame
@@ -121,7 +163,80 @@ public class QueryView {
         // Center the query dialog relative to the main frame
         queryDialog.setLocationRelativeTo(watcherView.mainFrame);
         queryDialog.setVisible(true);  // Display the dialog
+        ListenerForSubmitButton();
 
+
+    }
+    // the action listener for submit button
+    private void ListenerForSubmitButton() {
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                QueryDataBase();
+            }
+        });
+    }
+
+    // the action for data base which help user to use
+    private void QueryDataBase() {
+        String extension = extensionTextField.getText().trim();
+
+        // Clear up existing results
+        tableModel.setRowCount(0);
+
+        try {
+            if (extension.isEmpty()) {
+                // Query all events
+                queryEntireEvents();
+            } else {
+                // Query by extension
+                fieldExtension(extension);
+            }
+
+            System.out.println("Query completed successfully");
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(queryDialog,
+                    "Query failed: " + ex.getMessage(),
+                    "Database Incorrect",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // user find event from database
+    private void queryEntireEvents(){
+        System.out.print("Querying entire events from database..");
+
+        tableModel.addRow(new Object[]{1,".txt", "file1.txt", "C:/file", "CREATED", "2023-3-15 10:10:00"});
+        tableModel.addRow(new Object[]{2,".pdf", "personal statement.pdf", "C:/file", "CREATED", "2023-3-15 10:10:00"});
+        tableModel.addRow(new Object[]{3,".jpg", "image.jpg", "C:/file", "CREATED", "2023-6-12 1:10:00"});
+        tableModel.addRow(new Object[]{4,".erl", "App.erl", "C:/file", "CREATED", "2024-8-15 13:10:00"});
+    }
+
+    //file extension the query events
+    private void fieldExtension(String extension){
+        //if the file is not on database, we set the "."
+        if(!extension.startsWith(".")){
+            extension = "." + extension;
+        }
+
+        System.out.println("Querying events with extension: " + extension);
+        // Sample data based on extension - replace this with actual database results
+        if (extension.equals(".txt")) {
+            tableModel.addRow(new Object[]{1, ".txt", "notes.txt", "C:/Documents", "CREATED", "2023-10-15 10:15:00"});
+            tableModel.addRow(new Object[]{2, ".txt", "readme.txt", "C:/Projects", "MODIFIED", "2023-10-14 15:30:00"});
+        } else if (extension.equals(".erl")) {
+            tableModel.addRow(new Object[]{1, ".erl", "Main.java", "C:/Code", "CREATED", "2023-10-15 09:00:00"});
+            tableModel.addRow(new Object[]{2, ".erl", "Utils.java", "C:/Code", "MODIFIED", "2023-10-14 11:15:00"});
+        } else if (extension.equals(".pdf")) {
+            tableModel.addRow(new Object[]{1, ".pdf", "report.pdf", "C:/Documents", "CREATED", "2023-10-13 16:45:00"});
+        } else {
+            // No results found for this extension
+            JOptionPane.showMessageDialog(queryDialog,
+                    "No files found with extension: " + extension,
+                    "No Results",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
 
     }
 

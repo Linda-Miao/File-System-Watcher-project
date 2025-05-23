@@ -133,6 +133,7 @@ public final class FileWatcherView implements PropertyChangeListener{
 
         initComponents();
 
+
     }
 
     public void initComponents() {
@@ -322,9 +323,6 @@ public final class FileWatcherView implements PropertyChangeListener{
             }
         });
     }
-
-
-
     //helper function for JMenuItem (Help-> item->contact Us)
     public void editMenuJMenuItem() {
         JMenuItem contactUs = new JMenuItem("Contact Us");
@@ -363,7 +361,6 @@ public final class FileWatcherView implements PropertyChangeListener{
             }
         });
     }
-//new ImageIcon(ICON_PATH)
 
 
     //helper function for JMenubar
@@ -383,6 +380,97 @@ public final class FileWatcherView implements PropertyChangeListener{
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
         menuBar.add(helpMenu);
+
+        //Create Edit menu items:
+        JMenuItem exportMenuItem = new JMenuItem("Export Results...");
+        JMenuItem sortMenuItem = new JMenuItem("Sort Events");
+        JMenuItem clearMenuItem = new JMenuItem("Clear All Events");
+        JMenuItem bookmarkMenuItem = new JMenuItem("Bookmark Event");
+
+        // Add menu items to Edit menu
+        editMenu.add(exportMenuItem);
+        editMenu.addSeparator(); // Add a separator line
+        editMenu.add(sortMenuItem);
+        editMenu.add(clearMenuItem);
+        editMenu.addSeparator();
+        editMenu.add(bookmarkMenuItem);
+
+        menuBar.add(fileMenu);
+        menuBar.add(editMenu);
+        menuBar.add(helpMenu);
+
+        // call EditMenuListeners ()
+        EditMenuListeners(exportMenuItem, sortMenuItem, clearMenuItem, bookmarkMenuItem);
+    }
+
+//helper function for Edit listener
+private void EditMenuListeners(JMenuItem exportMenuItem, JMenuItem sortMenuItem,
+                                    JMenuItem clearMenuItem, JMenuItem bookmarkMenuItem) {
+
+    // Export Results action
+    exportMenuItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Export Results clicked");
+            exportResults();
+        }
+    });
+
+    // Sort Events action
+    sortMenuItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Sort Events clicked");
+            sortEvents();
+        }
+    });
+
+    // Clear All Events action
+    clearMenuItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Clear All Events clicked");
+            clearAllEvents();
+        }
+    });
+
+
+    // Bookmark Event action
+    bookmarkMenuItem.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("Bookmark Event clicked");
+            bookmarkEvent();
+        }
+    });
+}
+
+
+// PlaceHolder function for edit.
+private void exportResults() {
+        // for export
+        JOptionPane.showMessageDialog(mainFrame,
+                "Export functionality will be implemented here",
+                "Export Results",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+private void sortEvents() {
+        // for sort
+        JOptionPane.showMessageDialog(mainFrame,
+                "Sort functionality will be implemented here",
+                "Sort Events",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+    private void clearAllEvents() {
+        // for clear up
+        JOptionPane.showMessageDialog(mainFrame,
+                "Clear functionality will be implemented here",
+                "Clear All Events",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    private void bookmarkEvent() {
+        //  for bookmark
+        JOptionPane.showMessageDialog(mainFrame,
+                "Bookmark functionality will be implemented here",
+                "Bookmark Event",
+                JOptionPane.INFORMATION_MESSAGE);
     }
 
 
@@ -458,20 +546,13 @@ public final class FileWatcherView implements PropertyChangeListener{
     }
     public void showQueryDialog(){
         QueryView queryView = new QueryView(this);
+
+        /*
+Query by file size
+Combined queries (e.g., all .txt files modified in the last 24 hours)
+Query for the k-th most frequent viewed file
+ */
     }
-
-    /*
-
-    public void actionPerformed(ActionEvent e)
-    {
-        String s = e.getActionCommand();
-        if (s.equals("click")) {
-            // create a dialog Box
-            JDialog d = new JDialog(f, "dialog Box");
-
-            // create a label
-
-     */
 
     @java.lang.Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -486,6 +567,7 @@ public final class FileWatcherView implements PropertyChangeListener{
         }
     }
 }
+
 
 
 

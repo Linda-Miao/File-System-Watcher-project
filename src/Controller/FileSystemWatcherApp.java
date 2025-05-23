@@ -15,3 +15,21 @@ public class FileSystemWatcherApp {
         }
     }
 }
+
+/*
+For "Query Database", you can do:
+
+Query by file size
+Combined queries (e.g., all .txt files modified in the last 24 hours)
+Query for the k-th most frequent viewed file (that's one of the most popular questions on Leetcode)
+
+
+For "Edit" menu, you can do:
+
+Export query results to CSV/TXT file
+Sort events by different columns (filename, time, event type)
+Bookmark important events for later reference
+Add notes to specific file events (could be stored in the database)
+
+
+ */
