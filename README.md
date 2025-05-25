@@ -3,23 +3,24 @@ tcss360
 
 File Watcher instruction: 
 A real-time file monitoring application built with Java Swing that tracks file system changes and displays them in an intuitive user interface.
+
  Features
 Core Monitoring
-	•	Real-time file monitoring - Watch folders for file changes as they happen
-	•	File type filtering - Monitor specific extensions or all file types
-	•	Event tracking - Track file creation, modification, and deletion events
-	•	Intuitive table view - See all file events with timestamps and details
+	1: Real-time file monitoring - Watch folders for file changes as they happen
+	2: File type filtering - Monitor specific extensions or all file types
+	3: Event tracking - Track file creation, modification, and deletion events
+	4: Intuitive table view - See all file events with timestamps and details
 Data Management
-	•	Export Results - Save monitoring data to files
-	•	Sort Events - Organize events by different criteria
-	•	Clear All Events - Reset the monitoring table
-	•	Bookmark Event - Mark important file events
-	•	Query Database - Search and filter file events by extension
+	1: Export Results - Save monitoring data to files
+	2: Sort Events - Organize events by different criteria
+	3: Clear All Events - Reset the monitoring table
+	4: Bookmark Event - Mark important file events
+	5: Query Database - Search and filter file events by extension
 User Interface
-	•	Clean GUI - Easy-to-use interface with clear visual feedback
-	•	Menu system - Access all features through organized menus
-	•	Help system - Built-in contact and support information
-	•	Cross-platform - Works on Windows, macOS, and Linux
+	1: Clean GUI - Easy-to-use interface with clear visual feedback
+	2: Menu system - Access all features through organized menus
+	3: Help system - Built-in contact and support information
+	4: Cross-platform - Works on Windows, macOS, and Linux
 
 
 How to Use
