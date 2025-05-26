@@ -8,6 +8,12 @@ import java.awt.event.ActionListener;
 import java.beans.*;
 import java.awt.*;
 import java.util.Arrays;
+//??
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /*
 BorderLayout for the main containers
@@ -72,6 +78,17 @@ public final class FileWatcherView implements PropertyChangeListener{
     private final JMenu helpMenu;
 
 
+    // ADD defaultTableModel ???
+    private DefaultTableModel tableModel;  // Make it a class field
+    private JTable table;
+
+
+    /// ?? for start and stop button
+    private WatchService watchService;
+    private ExecutorService executorService;
+    private boolean isWatching = false;
+    private String currentWatchPath = "";
+    private String currentExtension = "";
 
     /**
      * The constructor.
@@ -195,7 +212,16 @@ public final class FileWatcherView implements PropertyChangeListener{
         tablePanel.setBorder(BorderFactory.createTitledBorder("File Watcher View:"));
 
         // Initialize the table model with column headers and no initial rows
-        DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
+       // DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
+
+        // ????
+        this.tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
+        //???
+        tableModel.addRow(new Object[]{1, ".txt", "notes.txt", "/documents/work", "Created", "2023-10-15 10:15:00"});
+        tableModel.addRow(new Object[]{2, ".java", "Main.java", "/projects/code", "Modified", "2023-10-15 12:30:00"});
+
+
+
         // Add test data to the table model
         tableModel.addRow(new Object[]{1, ".txt", "notes.txt", "/documents/work", "Created", "2023-10-15 10:15:00"});
         tableModel.addRow(new Object[]{2, ".java", "Main.java", "/projects/code", "Modified", "2023-10-15 12:30:00"});
@@ -205,8 +231,9 @@ public final class FileWatcherView implements PropertyChangeListener{
         tableModel.addRow(new Object[]{6, ".pdf", "paper.pdf", "/documents/research", "Archived", "2023-10-12 18:45:00"});
 
         // Create a JTable using the table model
-        JTable table = new JTable(tableModel);
-
+        //JTable table = new JTable(tableModel);
+        // ??
+        this.table = new JTable(tableModel);
         // Prevent the table from resizing columns to fit within the viewport
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto-resizing of columns
 
@@ -260,58 +287,125 @@ public final class FileWatcherView implements PropertyChangeListener{
 
     //helper function for Actionlistener(submit, stop, start)
     public void collectActionPerformed(){
-        // property change list for start button
-        startButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-            @Override
-            public void propertyChange(PropertyChangeEvent e){
-                System.out.println(" " + e.getNewValue());
-            }
-        });
+//        // property change list for start button
+//        startButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
+//            @Override
+//            public void propertyChange(PropertyChangeEvent e){
+//                System.out.println(" " + e.getNewValue());
+//            }
+//        });
+//
+//        // property change list for start button
+//        stopButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
+//            @Override
+//            public void propertyChange(PropertyChangeEvent e){
+//                System.out.println(" " + e.getNewValue());
+//            }
+//        });
+//
+//        // Action listeners for start button
+//        startButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                System.out.println("Started");
+//                startButton.setEnabled(false);
+//                stopButton.setEnabled(true);startButton.setEnabled(false);
+//                startMenuItem.setEnabled(false);
+//                stopMenuItem.setEnabled(true);
+//            }
+//        });
+//
+//        // Action listeners for stop button
+//        stopButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                System.out.println("Stoped");
+//
+//                startButton.setEnabled(true);
+//                stopButton.setEnabled(false);
+//                startMenuItem.setEnabled(true);
+//                stopMenuItem.setEnabled(false);
+//            }
+//        });
+//        // property change list for submit button
+//        submitButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
+//            @Override
+//            public void propertyChange(PropertyChangeEvent e){
+//                System.out.println(" " + e.getNewValue());
+//            }
+//        });
 
-        // property change list for start button
-        stopButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-            @Override
-            public void propertyChange(PropertyChangeEvent e){
-                System.out.println(" " + e.getNewValue());
-            }
-        });
 
-        // Action listeners for start button
+
+
+        // stop and start button new ????
+        // In collectActionPerformed() method, REPLACE the startButton.addActionListener with:
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Started");
+
+                // Get current settings
+                currentWatchPath = directySelector.getText().trim();
+                currentExtension = (String) extensionSelector.getSelectedItem();
+
+                if (currentWatchPath.isEmpty()) {
+                    JOptionPane.showMessageDialog(mainFrame,
+                            "Please enter a path first and click Submit",
+                            "No Path Set",
+                            JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
+
+                // Start file watching
+                startFileWatching();
+
+                // Update UI
                 startButton.setEnabled(false);
-                stopButton.setEnabled(true);startButton.setEnabled(false);
+                stopButton.setEnabled(true);
                 startMenuItem.setEnabled(false);
                 stopMenuItem.setEnabled(true);
             }
         });
 
-        // Action listeners for stop button
+        // REPLACE your existing Stop button action listener with:
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Stoped");
+                System.out.println("Stopped");
 
+                // Stop file watching
+                stopFileWatching();
+
+                // Update UI
                 startButton.setEnabled(true);
                 stopButton.setEnabled(false);
                 startMenuItem.setEnabled(true);
                 stopMenuItem.setEnabled(false);
             }
         });
-        // property change list for submit button
-        submitButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-            @Override
-            public void propertyChange(PropertyChangeEvent e){
-                System.out.println(" " + e.getNewValue());
-            }
-        });
 
-        // Action listeners for submit button
+
+
+
+//        // Action listeners for submit button
+//        submitButton.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                System.out.println("Submit");
+//            }
+//        });
+            //submit button action listener
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Submit");
-                //stopButton.setEnabled(false);
-                //startButton.setEnabled(true);
+                String path = directySelector.getText().trim();
+                String extension = (String) extensionSelector.getSelectedItem();
+
+                // Apply the settings and prepare for watching
+                System.out.println("Configured: Path=" + path + ", Extension=" + extension);
+
+                // Enable start button and show user it's ready
+                startButton.setEnabled(true);
+                JOptionPane.showMessageDialog(mainFrame,
+                        "Settings applied! Click 'Start' to begin watching:\nPath: " + path +
+                                "\nExtension: " + (extension.isEmpty() ? "ALL files" : extension),
+                        "Ready to Watch",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -323,6 +417,134 @@ public final class FileWatcherView implements PropertyChangeListener{
             }
         });
     }
+
+
+    // helper function for implement start and stop ???
+
+// ADD these new methods to your FileWatcherView class:
+
+        private void startFileWatching() {
+            try {
+                // Create watch service
+                watchService = FileSystems.getDefault().newWatchService();
+                Path pathToWatch = Paths.get(currentWatchPath);
+
+                // Register the path for file events
+                pathToWatch.register(watchService,
+                        StandardWatchEventKinds.ENTRY_CREATE,
+                        StandardWatchEventKinds.ENTRY_DELETE,
+                        StandardWatchEventKinds.ENTRY_MODIFY);
+
+                isWatching = true;
+
+                // Start watching in a separate thread
+                executorService = Executors.newSingleThreadExecutor();
+                executorService.submit(() -> {
+                    while (isWatching) {
+                        try {
+                            WatchKey key = watchService.take(); // Wait for events
+
+                            for (WatchEvent<?> event : key.pollEvents()) {
+                                WatchEvent.Kind<?> kind = event.kind();
+                                Path fileName = (Path) event.context();
+                                String fileNameStr = fileName.toString();
+
+                                // Filter by extension if specified
+                                if (currentExtension != null && !currentExtension.isEmpty()) {
+                                    if (!fileNameStr.toLowerCase().endsWith(currentExtension.toLowerCase())) {
+                                        continue; // Skip files that don't match extension
+                                    }
+                                }
+
+                                // Add event to table (on EDT thread)
+                                SwingUtilities.invokeLater(() -> {
+                                    addFileEventToTable(fileNameStr, kind.name(), currentWatchPath);
+                                });
+                            }
+
+                            key.reset(); // Reset the key to receive further events
+
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                            break;
+                        } catch (Exception e) {
+                            System.err.println("Error in file watching: " + e.getMessage());
+                        }
+                    }
+                });
+
+                JOptionPane.showMessageDialog(mainFrame,
+                        "File watching started!\nMonitoring: " + currentWatchPath +
+                                "\nExtension: " + (currentExtension.isEmpty() ? "ALL files" : currentExtension),
+                        "Watching Started",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(mainFrame,
+                        "Error starting file watcher: " + e.getMessage(),
+                        "Watch Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private void stopFileWatching() {
+            isWatching = false;
+
+            try {
+                if (watchService != null) {
+                    watchService.close();
+                }
+                if (executorService != null) {
+                    executorService.shutdown();
+                }
+
+                JOptionPane.showMessageDialog(mainFrame,
+                        "File watching stopped.",
+                        "Watching Stopped",
+                        JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (IOException e) {
+                System.err.println("Error stopping file watcher: " + e.getMessage());
+            }
+        }
+
+        private void addFileEventToTable(String fileName, String eventType, String path) {
+            // Get file extension
+            String extension = "";
+            int lastDot = fileName.lastIndexOf('.');
+            if (lastDot > 0) {
+                extension = fileName.substring(lastDot);
+            }
+
+            // Get current time
+            String currentTime = java.time.LocalDateTime.now()
+                    .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+            // Add new row to table
+            int rowNumber = tableModel.getRowCount() + 1;
+            tableModel.addRow(new Object[]{
+                    rowNumber,
+                    extension,
+                    fileName,
+                    path,
+                    eventType,
+                    currentTime
+            });
+
+            // Auto-scroll to the new row
+            table.scrollRectToVisible(table.getCellRect(tableModel.getRowCount() - 1, 0, true));
+
+            System.out.println("File event added: " + fileName + " - " + eventType);
+        }
+
+
+        //helper function for table model
+
+    public DefaultTableModel getTableModel() {
+        return this.tableModel;
+    }
+
+
     //helper function for JMenuItem (Help-> item->contact Us)
     public void editMenuJMenuItem() {
         JMenuItem contactUs = new JMenuItem("Contact Us");
@@ -334,7 +556,7 @@ public final class FileWatcherView implements PropertyChangeListener{
                 <html>
                 <div style='text-align: center;'>
                     <br><br><br><br>
-                    Name: John Smith<br>
+                    Manager: John Smith<br>
                     Email: help@example.com<br>
                     Phone: +1-123-456-7890
                 </div>

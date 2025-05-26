@@ -240,4 +240,23 @@ public class QueryView {
 
     }
 
+
+    // ??
+
+//    // In FileWatcherView.java, update the clearAllEvents() method:
+//    private void clearAllEvents() {
+//        int result = JOptionPane.showConfirmDialog(mainFrame,
+//                "Are you sure you want to clear all events?",
+//                "Confirm Clear",
+//                JOptionPane.YES_NO_OPTION);
+//
+//        if (result == JOptionPane.YES_OPTION) {
+//            tableModel.setRowCount(0); // Clear the main table
+//            JOptionPane.showMessageDialog(mainFrame,
+//                    "All events cleared successfully",
+//                    "Events Cleared",
+//                    JOptionPane.INFORMATION_MESSAGE);
+//        }
+//    }
+
 }
