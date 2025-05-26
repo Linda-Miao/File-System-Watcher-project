@@ -80,5 +80,5 @@ Step 4: Click Start
  
 	•	File changes appear instantly in the table
  
-	•	Shows "File watching starte.
+	•	Shows File watching start.
  
