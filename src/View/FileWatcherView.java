@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.beans.*;
 import java.awt.*;
 import java.util.Arrays;
-//??
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.io.IOException;
@@ -26,7 +25,7 @@ public final class FileWatcherView implements PropertyChangeListener{
     public static final Dimension WINDOW_DIMENSION = Toolkit.getDefaultToolkit().
             getScreenSize();
     /**The width of the JFrame.*/
-    public static final int JFRAME_WIDTH = WINDOW_DIMENSION.width / 3;
+    public static final int JFRAME_WIDTH = WINDOW_DIMENSION.width / 2;
 
     /** The height of the JFrame.*/
     public static final int JFRAME_HEIGHT = WINDOW_DIMENSION.height / 3;
@@ -58,7 +57,7 @@ public final class FileWatcherView implements PropertyChangeListener{
     private final JTextField directySelector;
     private final JMenuBar menuBar;
     private JMenu menu;         // each menu in the menu-bar
-   // private JMenuItem menuItem; // an item in a menu
+    // private JMenuItem menuItem; // an item in a menu
     //private JLabel label;//this for contenPane and layout
     private JComboBox box;
 
@@ -94,11 +93,11 @@ public final class FileWatcherView implements PropertyChangeListener{
      * The constructor.
      */
     public FileWatcherView() {
-      submitButton = new JButton("Submit");
+        submitButton = new JButton("Submit");
         mainFrame = new JFrame(WINDOW_TITLE); //create a new JFrame Object(frame from field)
         mainFrame.setSize(GUI_DIMENSION);
         mainFrame.setLocationRelativeTo(null);
-      //Initializes fileEventList and sets its selection mode.
+        //Initializes fileEventList and sets its selection mode.
         fileEventList = new JList<>(new String[] {
                 "Sample file that exceeds viewport width", "Another long event string",
                 "File type: .txt", "Path: /this/is/a/long/path/to/a/file.txt"
@@ -115,7 +114,7 @@ public final class FileWatcherView implements PropertyChangeListener{
             throw new RuntimeException(e);
         }
         this.menuBar = new JMenuBar();
-       startButton = new JButton("start"); // check the gray and work color late
+        startButton = new JButton("start"); // check the gray and work color late
         stopButton = new JButton("stop");  // check the gray and work color late
 
         // A menu-bar contains menus. A menu contains menu-items (or sub-Menu)
@@ -124,8 +123,6 @@ public final class FileWatcherView implements PropertyChangeListener{
         JMenuItem menuItem; // an item in a menu
         menuBar = new JMenuBar();
 
-       // box = new JComboBox<>(commonExtensions);
-// Remove this redundant/unnecessary line, as it's already redefined in `initComponents()` or unused.
         mainFrame.setSize(400, 300);
         mainFrame.setIconImage(new ImageIcon(ICON_PATH).getImage());
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -212,7 +209,7 @@ public final class FileWatcherView implements PropertyChangeListener{
         tablePanel.setBorder(BorderFactory.createTitledBorder("File Watcher View:"));
 
         // Initialize the table model with column headers and no initial rows
-       // DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
+        // DefaultTableModel tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
 
         // ????
         this.tableModel = new DefaultTableModel(new Object[]{"Row", "Extension", "Filename", "PATH", "Event", "Date/Time"}, 0);
@@ -232,7 +229,6 @@ public final class FileWatcherView implements PropertyChangeListener{
 
         // Create a JTable using the table model
         //JTable table = new JTable(tableModel);
-        // ??
         this.table = new JTable(tableModel);
         // Prevent the table from resizing columns to fit within the viewport
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF); // Disable auto-resizing of columns
@@ -287,57 +283,7 @@ public final class FileWatcherView implements PropertyChangeListener{
 
     //helper function for Actionlistener(submit, stop, start)
     public void collectActionPerformed(){
-//        // property change list for start button
-//        startButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-//            @Override
-//            public void propertyChange(PropertyChangeEvent e){
-//                System.out.println(" " + e.getNewValue());
-//            }
-//        });
-//
-//        // property change list for start button
-//        stopButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-//            @Override
-//            public void propertyChange(PropertyChangeEvent e){
-//                System.out.println(" " + e.getNewValue());
-//            }
-//        });
-//
-//        // Action listeners for start button
-//        startButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Started");
-//                startButton.setEnabled(false);
-//                stopButton.setEnabled(true);startButton.setEnabled(false);
-//                startMenuItem.setEnabled(false);
-//                stopMenuItem.setEnabled(true);
-//            }
-//        });
-//
-//        // Action listeners for stop button
-//        stopButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Stoped");
-//
-//                startButton.setEnabled(true);
-//                stopButton.setEnabled(false);
-//                startMenuItem.setEnabled(true);
-//                stopMenuItem.setEnabled(false);
-//            }
-//        });
-//        // property change list for submit button
-//        submitButton.addPropertyChangeListener("enable" , new PropertyChangeListener(){
-//            @Override
-//            public void propertyChange(PropertyChangeEvent e){
-//                System.out.println(" " + e.getNewValue());
-//            }
-//        });
 
-
-
-
-        // stop and start button new ????
-        // In collectActionPerformed() method, REPLACE the startButton.addActionListener with:
         startButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Started");
@@ -354,7 +300,6 @@ public final class FileWatcherView implements PropertyChangeListener{
                     return;
                 }
 
-                // Start file watching
                 startFileWatching();
 
                 // Update UI
@@ -382,15 +327,6 @@ public final class FileWatcherView implements PropertyChangeListener{
         });
 
 
-
-
-//        // Action listeners for submit button
-//        submitButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println("Submit");
-//            }
-//        });
-            //submit button action listener
         submitButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String path = directySelector.getText().trim();
@@ -419,126 +355,123 @@ public final class FileWatcherView implements PropertyChangeListener{
     }
 
 
-    // helper function for implement start and stop ???
+    // helper function for implement start and stop
+    private void startFileWatching() {
+        try {
+            // Create watch service
+            watchService = FileSystems.getDefault().newWatchService();
+            Path pathToWatch = Paths.get(currentWatchPath);
 
-// ADD these new methods to your FileWatcherView class:
+            // Register the path for file events
+            pathToWatch.register(watchService,
+                    StandardWatchEventKinds.ENTRY_CREATE,
+                    StandardWatchEventKinds.ENTRY_DELETE,
+                    StandardWatchEventKinds.ENTRY_MODIFY);
 
-        private void startFileWatching() {
-            try {
-                // Create watch service
-                watchService = FileSystems.getDefault().newWatchService();
-                Path pathToWatch = Paths.get(currentWatchPath);
+            isWatching = true;
 
-                // Register the path for file events
-                pathToWatch.register(watchService,
-                        StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_DELETE,
-                        StandardWatchEventKinds.ENTRY_MODIFY);
+            // Start watching in a separate thread
+            executorService = Executors.newSingleThreadExecutor();
+            executorService.submit(() -> {
+                while (isWatching) {
+                    try {
+                        WatchKey key = watchService.take(); // Wait for events
 
-                isWatching = true;
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            WatchEvent.Kind<?> kind = event.kind();
+                            Path fileName = (Path) event.context();
+                            String fileNameStr = fileName.toString();
 
-                // Start watching in a separate thread
-                executorService = Executors.newSingleThreadExecutor();
-                executorService.submit(() -> {
-                    while (isWatching) {
-                        try {
-                            WatchKey key = watchService.take(); // Wait for events
-
-                            for (WatchEvent<?> event : key.pollEvents()) {
-                                WatchEvent.Kind<?> kind = event.kind();
-                                Path fileName = (Path) event.context();
-                                String fileNameStr = fileName.toString();
-
-                                // Filter by extension if specified
-                                if (currentExtension != null && !currentExtension.isEmpty()) {
-                                    if (!fileNameStr.toLowerCase().endsWith(currentExtension.toLowerCase())) {
-                                        continue; // Skip files that don't match extension
-                                    }
+                            // Filter by extension if specified
+                            if (currentExtension != null && !currentExtension.isEmpty()) {
+                                if (!fileNameStr.toLowerCase().endsWith(currentExtension.toLowerCase())) {
+                                    continue; // Skip files that don't match extension
                                 }
-
-                                // Add event to table (on EDT thread)
-                                SwingUtilities.invokeLater(() -> {
-                                    addFileEventToTable(fileNameStr, kind.name(), currentWatchPath);
-                                });
                             }
 
-                            key.reset(); // Reset the key to receive further events
-
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            break;
-                        } catch (Exception e) {
-                            System.err.println("Error in file watching: " + e.getMessage());
+                            // Add event to table (on EDT thread)
+                            SwingUtilities.invokeLater(() -> {
+                                addFileEventToTable(fileNameStr, kind.name(), currentWatchPath);
+                            });
                         }
+
+                        key.reset(); // Reset the key to receive further events
+
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    } catch (Exception e) {
+                        System.err.println("Error in file watching: " + e.getMessage());
                     }
-                });
-
-                JOptionPane.showMessageDialog(mainFrame,
-                        "File watching started!\nMonitoring: " + currentWatchPath +
-                                "\nExtension: " + (currentExtension.isEmpty() ? "ALL files" : currentExtension),
-                        "Watching Started",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(mainFrame,
-                        "Error starting file watcher: " + e.getMessage(),
-                        "Watch Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
-
-        private void stopFileWatching() {
-            isWatching = false;
-
-            try {
-                if (watchService != null) {
-                    watchService.close();
                 }
-                if (executorService != null) {
-                    executorService.shutdown();
-                }
-
-                JOptionPane.showMessageDialog(mainFrame,
-                        "File watching stopped.",
-                        "Watching Stopped",
-                        JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (IOException e) {
-                System.err.println("Error stopping file watcher: " + e.getMessage());
-            }
-        }
-
-        private void addFileEventToTable(String fileName, String eventType, String path) {
-            // Get file extension
-            String extension = "";
-            int lastDot = fileName.lastIndexOf('.');
-            if (lastDot > 0) {
-                extension = fileName.substring(lastDot);
-            }
-
-            // Get current time
-            String currentTime = java.time.LocalDateTime.now()
-                    .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-            // Add new row to table
-            int rowNumber = tableModel.getRowCount() + 1;
-            tableModel.addRow(new Object[]{
-                    rowNumber,
-                    extension,
-                    fileName,
-                    path,
-                    eventType,
-                    currentTime
             });
 
-            // Auto-scroll to the new row
-            table.scrollRectToVisible(table.getCellRect(tableModel.getRowCount() - 1, 0, true));
+            JOptionPane.showMessageDialog(mainFrame,
+                    "File watching started!\nMonitoring: " + currentWatchPath +
+                            "\nExtension: " + (currentExtension.isEmpty() ? "ALL files" : currentExtension),
+                    "Watching Started",
+                    JOptionPane.INFORMATION_MESSAGE);
 
-            System.out.println("File event added: " + fileName + " - " + eventType);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(mainFrame,
+                    "Error starting file watcher: " + e.getMessage(),
+                    "Watch Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void stopFileWatching() {
+        isWatching = false;
+
+        try {
+            if (watchService != null) {
+                watchService.close();
+            }
+            if (executorService != null) {
+                executorService.shutdown();
+            }
+
+            JOptionPane.showMessageDialog(mainFrame,
+                    "File watching stopped.",
+                    "Watching Stopped",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (IOException e) {
+            System.err.println("Error stopping file watcher: " + e.getMessage());
+        }
+    }
+
+    private void addFileEventToTable(String fileName, String eventType, String path) {
+        // Get file extension
+        String extension = "";
+        int lastDot = fileName.lastIndexOf('.');
+        if (lastDot > 0) {
+            extension = fileName.substring(lastDot);
         }
 
+        // Get current time
+        String currentTime = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 
-        //helper function for table model
+        // Add new row to table
+        int rowNumber = tableModel.getRowCount() + 1;
+        tableModel.addRow(new Object[]{
+                rowNumber,
+                extension,
+                fileName,
+                path,
+                eventType,
+                currentTime
+        });
+
+        // Auto-scroll to the new row
+        table.scrollRectToVisible(table.getCellRect(tableModel.getRowCount() - 1, 0, true));
+
+        System.out.println("File event added: " + fileName + " - " + eventType);
+    }
+
+
+    //helper function for table model
 
     public DefaultTableModel getTableModel() {
         return this.tableModel;
@@ -625,54 +558,54 @@ public final class FileWatcherView implements PropertyChangeListener{
         EditMenuListeners(exportMenuItem, sortMenuItem, clearMenuItem, bookmarkMenuItem);
     }
 
-//helper function for Edit listener
-private void EditMenuListeners(JMenuItem exportMenuItem, JMenuItem sortMenuItem,
-                                    JMenuItem clearMenuItem, JMenuItem bookmarkMenuItem) {
+    //helper function for Edit listener
+    private void EditMenuListeners(JMenuItem exportMenuItem, JMenuItem sortMenuItem,
+                                   JMenuItem clearMenuItem, JMenuItem bookmarkMenuItem) {
 
-    // Export Results action
-    exportMenuItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("Export Results clicked");
-            exportResults();
-        }
-    });
+        // Export Results action
+        exportMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Export Results clicked");
+                exportResults();
+            }
+        });
 
-    // Sort Events action
-    sortMenuItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("Sort Events clicked");
-            sortEvents();
-        }
-    });
+        // Sort Events action
+        sortMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Sort Events clicked");
+                sortEvents();
+            }
+        });
 
-    // Clear All Events action
-    clearMenuItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("Clear All Events clicked");
-            clearAllEvents();
-        }
-    });
-
-
-    // Bookmark Event action
-    bookmarkMenuItem.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-            System.out.println("Bookmark Event clicked");
-            bookmarkEvent();
-        }
-    });
-}
+        // Clear All Events action
+        clearMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Clear All Events clicked");
+                clearAllEvents();
+            }
+        });
 
 
-// PlaceHolder function for edit.
-private void exportResults() {
+        // Bookmark Event action
+        bookmarkMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Bookmark Event clicked");
+                bookmarkEvent();
+            }
+        });
+    }
+
+
+    // PlaceHolder function for edit.
+    private void exportResults() {
         // for export
         JOptionPane.showMessageDialog(mainFrame,
                 "Export functionality will be implemented here",
                 "Export Results",
                 JOptionPane.INFORMATION_MESSAGE);
     }
-private void sortEvents() {
+    private void sortEvents() {
         // for sort
         JOptionPane.showMessageDialog(mainFrame,
                 "Sort functionality will be implemented here",
@@ -769,11 +702,6 @@ private void sortEvents() {
     public void showQueryDialog(){
         QueryView queryView = new QueryView(this);
 
-        /*
-Query by file size
-Combined queries (e.g., all .txt files modified in the last 24 hours)
-Query for the k-th most frequent viewed file
- */
     }
 
     @java.lang.Override
@@ -781,14 +709,15 @@ Query for the k-th most frequent viewed file
         String name = evt.getPropertyName();
         switch (name){
             case "fileEventAdded":
-            System.out.println("fileEventAdded");
-            break;
+                System.out.println("fileEventAdded");
+                break;
             case "fileEventsCleared":
                 System.out.println("fileEventsCleared");
-            break;
+                break;
         }
     }
 }
+
 
 
 
