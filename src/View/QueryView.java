@@ -50,7 +50,7 @@ public class QueryView {
     // Date formatting
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    // Event types for dropdown (matching your backend EventType enum)
+    // Event types for dropdown (matching backend EventType enum)
     private final String[] eventTypes = {
             "ALL", "CREATED", "MODIFIED", "DELETED", "ACCESSED", "ARCHIVED"
     };
