@@ -31,22 +31,18 @@ public final class FileWatcherView implements PropertyChangeListener{
     private final JList<String> fileEventList; //JList objects for displaying items.
     /** Title of the application.*/
     public static final String WINDOW_TITLE = "File Watcher";
-
     protected final JFrame mainFrame;
     private final JComboBox extensionSelector;
     private final JTextField directySelector;
     private final JMenuBar menuBar;
-    //private JMenu menu;         // each menu in the menu-bar ??
-    //private JComboBox box; // ? ?
     /** Undo button of JButton. */
     private final JButton submitButton;
     private final JButton startButton;
     private final JButton stopButton;
     /** for JComboBox*/
-    private JComboBox<String>extensionDropdown; //for combobox dropdown
-    private JTextField extensionTextField;
+    private final JComboBox<String>extensionDropdown; //for comboBox dropdown
+    private final JTextField extensionTextField;
     private final String[] commonExtensions = {"", ".txt", ".pdf", ".docx", ".xlsx", ".csv", ".py", ".java", ".html", ".css", ".js"};
-
     private final JMenuItem startMenuItem;
     private final JMenuItem stopMenuItem;
     private final JMenuItem QueryMenuItem;
@@ -61,7 +57,7 @@ public final class FileWatcherView implements PropertyChangeListener{
     private String currentExtension = "";
 
     // PropertyChangeSupport for MVC communication
-    private PropertyChangeSupport support = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport support = new PropertyChangeSupport(this);
 
     /** The constructor.*/
     public FileWatcherView() {
@@ -90,11 +86,8 @@ public final class FileWatcherView implements PropertyChangeListener{
         stopButton = new JButton("stop");  // check the gray and work color late
 
         // A menu-bar contains menus. A menu contains menu-items (or sub-Menu)
-        JMenuBar menuBar;   // the menu-bar
-        JMenu menu;         // each menu in the menu-bar
-        JMenuItem menuItem; // an item in a menu
+        JMenuBar menuBar;
         menuBar = new JMenuBar();
-
         mainFrame.setSize(400, 300);
         mainFrame.setIconImage(new ImageIcon(ICON_PATH).getImage());
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -114,9 +107,8 @@ public final class FileWatcherView implements PropertyChangeListener{
         startButton.setEnabled(true);
         stopButton.setEnabled(false);
 
-        //Jmenu bar
+        //menu bar
         helpMenu = new JMenu("Help");
-
         initComponents();
     }
 
@@ -143,7 +135,7 @@ public final class FileWatcherView implements PropertyChangeListener{
         gbc.weightx = 1.0;
         formPanel.add(directySelector, gbc);  // Only add one component here
 
-        // Add Extension label and combobox
+        // Add Extension label and combBox
         gbc.gridx = 2;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.NONE;
@@ -230,7 +222,7 @@ public final class FileWatcherView implements PropertyChangeListener{
         System.out.println("Table panel contents: " + Arrays.toString(tablePanel.getComponents()));
     }
 
-    //Helper function for Actionlistener(submit, stop, start)
+    //Helper function for ActionListener(submit, stop, start)
     public void collectActionPerformed(){
 
         startButton.addActionListener(new ActionListener() {
@@ -469,7 +461,7 @@ public final class FileWatcherView implements PropertyChangeListener{
         });
     }
 
-    //helper function for JMenubar
+    //helper function for menuBar
     public void menuBarJMenuItem(){
         // Create menu bar
         JMenu fileMenu = new JMenu("File");
@@ -607,7 +599,7 @@ public final class FileWatcherView implements PropertyChangeListener{
         // Action listeners for start button
         stopMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Stoped");
+                System.out.println("Stopped");
 
                 // Fire property change for menu item
                 support.firePropertyChange("stopWatching", null, null);
