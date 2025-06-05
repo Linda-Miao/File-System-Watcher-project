@@ -1,10 +1,9 @@
+/* 360 File watcher project */
 package View;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,11 +12,12 @@ import java.time.format.DateTimeParseException;
 /**
  * Enhanced QueryView with comprehensive search capabilities.
  * Supports extension, event type, directory path, filename, and date range queries.
+ * @author Linda Miao
+ * @version 1.0
  */
 public class QueryView {
 
-    // ========================= UI COMPONENTS =========================
-
+    // ------ UI components -------
     // Main dialog and panels
     private JDialog queryDialog;
     private JPanel queryFormPanel;
@@ -45,7 +45,7 @@ public class QueryView {
     private JButton lastWeekButton;
     private JButton lastMonthButton;
 
-    // ========================= DATA =========================
+    // ------- Data ------
 
     // Date formatting
     private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -58,7 +58,7 @@ public class QueryView {
     // Reference to main view
     private final FileWatcherView watcherView;
 
-    // ========================= CONSTRUCTOR =========================
+    //------- Constructor -------
 
     public QueryView(FileWatcherView watcherView) {
         this.watcherView = watcherView;
@@ -83,11 +83,8 @@ public class QueryView {
         finalizeDialog();
     }
 
-    // ========================= INITIALIZATION =========================
-
-    /**
-     * Initializes all the new enhanced UI components.
-     */
+    // ------ Initialization -----
+    /** Initializes all the new enhanced UI components.*/
     private void initializeEnhancedComponents() {
         // Date components
         startDateTextField = new JTextField(12);
@@ -121,9 +118,7 @@ public class QueryView {
         eventTypeComboBox.setToolTipText("Select event type to filter");
     }
 
-    /**
-     * Creates the main query dialog.
-     */
+    /** Creates the main query dialog. */
     private void createQueryDialog() {
         queryDialog = new JDialog(watcherView.mainFrame, "Enhanced Query Interface", true);
         queryFormPanel = new JPanel(new BorderLayout());
@@ -135,20 +130,15 @@ public class QueryView {
         loadSampleData();
     }
 
-    // ========================= UI SETUP =========================
-
-    /**
-     * Sets up the complete UI layout.
-     */
+    // ----- UI setup -----
+    /** Sets up the complete UI layout.*/
     private void setupUI() {
         createEnhancedFormPanel();
         createTablePanel();
         layoutMainDialog();
     }
 
-    /**
-     * Creates the enhanced form panel with all search options.
-     */
+    /** Creates the enhanced form panel with all search options. */
     private void createEnhancedFormPanel() {
         JPanel formPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -175,9 +165,7 @@ public class QueryView {
         queryFormPanel.add(formPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Adds instruction section.
-     */
+    /** Adds instruction section.*/
     private void addInstructionSection(JPanel formPanel, GridBagConstraints gbc) {
         JLabel titleLabel = new JLabel("Advanced File Event Search");
         titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 14f));
@@ -188,9 +176,7 @@ public class QueryView {
         gbc.gridwidth = 1;
     }
 
-    /**
-     * Adds basic search section (extension).
-     */
+    /** Adds basic search section (extension).*/
     private void addBasicSearchSection(JPanel formPanel, GridBagConstraints gbc) {
         // Extension search row
         gbc.gridy = 1; gbc.gridx = 0; gbc.anchor = GridBagConstraints.WEST;
@@ -206,9 +192,7 @@ public class QueryView {
         gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
     }
 
-    /**
-     * Adds advanced search section (event type, directory, filename).
-     */
+    /** Adds advanced search section (event type, directory, filename).*/
     private void addAdvancedSearchSection(JPanel formPanel, GridBagConstraints gbc) {
         // Event Type row
         gbc.gridy = 2; gbc.gridx = 0;
@@ -237,9 +221,7 @@ public class QueryView {
         gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
     }
 
-    /**
-     * Adds date search section.
-     */
+    /** Adds date search section.*/
     private void addDateSearchSection(JPanel formPanel, GridBagConstraints gbc) {
         // Date range row
         gbc.gridy = 4; gbc.gridx = 0;
@@ -261,9 +243,7 @@ public class QueryView {
         gbc.fill = GridBagConstraints.NONE; gbc.weightx = 0;
     }
 
-    /**
-     * Adds quick time filter section.
-     */
+    /** Adds quick time filter section.*/
     private void addQuickTimeSection(JPanel formPanel, GridBagConstraints gbc) {
         JPanel quickTimePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         quickTimePanel.add(new JLabel("Quick Time Filters:"));
@@ -278,9 +258,7 @@ public class QueryView {
         gbc.gridwidth = 1;
     }
 
-    /**
-     * Adds action buttons section.
-     */
+    /** Adds action buttons section.*/
     private void addActionButtonsSection(JPanel formPanel, GridBagConstraints gbc) {
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
 
@@ -295,9 +273,7 @@ public class QueryView {
         formPanel.add(actionPanel, gbc);
     }
 
-    /**
-     * Creates the table panel for displaying results.
-     */
+    /** Creates the table panel for displaying results.*/
     private void createTablePanel() {
         JPanel tablePanel = new JPanel(new BorderLayout());
 
@@ -327,9 +303,7 @@ public class QueryView {
         queryDialog.add(tablePanel, createTableConstraints());
     }
 
-    /**
-     * Layouts the main dialog components.
-     */
+    /** Layouts the main dialog components.*/
     private void layoutMainDialog() {
         GridBagConstraints gbc = new GridBagConstraints();
 
@@ -340,9 +314,7 @@ public class QueryView {
         queryDialog.add(queryFormPanel, gbc);
     }
 
-    /**
-     * Creates constraints for table panel.
-     */
+    /** Creates constraints for table panel. */
     private GridBagConstraints createTableConstraints() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0; gbc.gridy = 1;
@@ -351,11 +323,9 @@ public class QueryView {
         return gbc;
     }
 
-    // ========================= EVENT LISTENERS =========================
+    // ------ Event listeners ------
 
-    /**
-     * Sets up all event listeners.
-     */
+    /** Sets up all event listeners.*/
     private void setupEventListeners() {
         // Basic extension search
         submitButton.addActionListener(e -> handleExtensionQuery());
@@ -378,7 +348,7 @@ public class QueryView {
         clearFieldsButton.addActionListener(e -> clearAllFields());
     }
 
-    // ========================= QUERY HANDLERS =========================
+    // ------ Query handlers -------
 
     /**
      * Handles extension-based queries.
