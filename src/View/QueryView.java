@@ -1,3 +1,4 @@
+
 /* 360 File watcher project */
 package View;
 
@@ -22,6 +23,7 @@ public class QueryView {
     private JDialog queryDialog;
     private JPanel queryFormPanel;
     private DefaultTableModel tableModel;
+    private JTable table; // store table reference for auto-resize
 
     // Basic search components
     private final JTextField extensionTextField;
@@ -79,6 +81,9 @@ public class QueryView {
         // Setup event listeners
         setupEventListeners();
 
+        //setup auto-resize capabilities
+        setupAutoResizeFeatures();
+
         // Show dialog
         finalizeDialog();
     }
@@ -103,6 +108,7 @@ public class QueryView {
         last24HoursButton = new JButton("Last 24h");
         lastWeekButton = new JButton("Last Week");
         lastMonthButton = new JButton("Last Month");
+
 
         // Set placeholder text and tooltips
         setPlaceholderText(extensionTextField, "txt, pdf, java, html...");
@@ -251,6 +257,7 @@ public class QueryView {
         quickTimePanel.add(lastWeekButton);
         quickTimePanel.add(lastMonthButton);
 
+
         gbc.gridy = 5; gbc.gridx = 0; gbc.gridwidth = 5;
         formPanel.add(quickTimePanel, gbc);
 
@@ -283,24 +290,49 @@ public class QueryView {
         tablePanel.add(resultsLabel, BorderLayout.NORTH);
 
         // Create table
-        JTable table = new JTable(tableModel);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table = new JTable(tableModel); // store table reference
 
-        // Set column widths
-        table.getColumnModel().getColumn(0).setPreferredWidth(50);   // Row
-        table.getColumnModel().getColumn(1).setPreferredWidth(150);  // Extension
-        table.getColumnModel().getColumn(2).setPreferredWidth(300);  // Filename
-        table.getColumnModel().getColumn(3).setPreferredWidth(400);  // PATH
-        table.getColumnModel().getColumn(4).setPreferredWidth(200);  // Event
-        table.getColumnModel().getColumn(5).setPreferredWidth(250);  // Date/Time
+        // setup optimal table configuration with horizontal scrolling
+        setupOptimalTableConfiguration();
 
         // Add scroll pane
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED); //  smart scrollbar
+        scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED); // smart scrollbar
         tablePanel.add(scrollPane, BorderLayout.CENTER);
 
         // Store table panel reference
         queryDialog.add(tablePanel, createTableConstraints());
+    }
+
+    // setup optimal table configuration method
+    private void setupOptimalTableConfiguration() {
+        // Keep horizontal scrolling for wide content
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        // Set smart column widths
+        table.getColumnModel().getColumn(0).setPreferredWidth(50);   // Row
+        table.getColumnModel().getColumn(1).setPreferredWidth(100);  // Extension
+        table.getColumnModel().getColumn(2).setPreferredWidth(200);  // Filename
+        table.getColumnModel().getColumn(3).setPreferredWidth(350);  // PATH
+        table.getColumnModel().getColumn(4).setPreferredWidth(100);  // Event
+        table.getColumnModel().getColumn(5).setPreferredWidth(160);  // Date/Time
+
+        // Set minimum widths to prevent too small columns
+        table.getColumnModel().getColumn(0).setMinWidth(40);
+        table.getColumnModel().getColumn(1).setMinWidth(60);
+        table.getColumnModel().getColumn(2).setMinWidth(120);
+        table.getColumnModel().getColumn(3).setMinWidth(200);
+        table.getColumnModel().getColumn(4).setMinWidth(80);
+        table.getColumnModel().getColumn(5).setMinWidth(130);
+
+        // Set maximum widths for size columns
+        table.getColumnModel().getColumn(0).setMaxWidth(80);   // Row
+        table.getColumnModel().getColumn(1).setMaxWidth(150);  // Extension
+        table.getColumnModel().getColumn(4).setMaxWidth(150);  // Event
+        table.getColumnModel().getColumn(5).setMaxWidth(200);  // Date/Time
+
+        System.out.println(" Query table configured with optimal sizing and horizontal scrolling");
     }
 
     /** Layouts the main dialog components.*/
@@ -323,6 +355,71 @@ public class QueryView {
         return gbc;
     }
 
+    // auto-resize setup method
+    private void setupAutoResizeFeatures() {
+        // Add table model listener for automatic resizing when data changes
+        tableModel.addTableModelListener(e -> {
+            SwingUtilities.invokeLater(this::autoResizeQueryDialog);
+        });
+
+        System.out.println("Auto-resize features enabled for query dialog");
+    }
+
+    //  calculate optimal dialog size method
+    private void autoResizeQueryDialog() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+        // Calculate optimal size based on content
+        int optimalWidth = calculateQueryOptimalWidth();
+        int optimalHeight = calculateQueryOptimalHeight();
+
+        // Set reasonable limits
+        int maxWidth = (int) (screenSize.width * 0.9);
+        int maxHeight = (int) (screenSize.height * 0.85);
+
+        int finalWidth = Math.min(optimalWidth, maxWidth);
+        int finalHeight = Math.min(optimalHeight, maxHeight);
+
+        // Ensure minimum usable size
+        finalWidth = Math.max(finalWidth, 1000);
+        finalHeight = Math.max(finalHeight, 700);
+
+        queryDialog.setSize(finalWidth, finalHeight);
+        queryDialog.setLocationRelativeTo(watcherView.mainFrame);
+
+        System.out.println(" Query dialog auto-resized to: " + finalWidth + "x" + finalHeight);
+    }
+
+    // database interface size - calculate optimal width method
+    private int calculateQueryOptimalWidth() {
+        if (table == null) return 1000;
+
+        // Calculate total preferred column width
+        int totalColumnWidth = 0;
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            totalColumnWidth += table.getColumnModel().getColumn(i).getPreferredWidth();
+        }
+
+        // Add padding for scrollbars and borders
+        return totalColumnWidth + 100;
+    }
+
+    // database interface size - calculate optimal height method
+    private int calculateQueryOptimalHeight() {
+        // Form section height
+        int formHeight = 220;
+
+        // Calculate table height based on rows
+        int rowCount = Math.max(tableModel.getRowCount(), 6); // Show at least 6 rows
+        int rowHeight = 25;
+        int tableHeight = (rowCount * rowHeight) + 60; // Add header and padding
+
+        // Limit maximum table height
+        tableHeight = Math.min(tableHeight, 500);
+
+        return formHeight + tableHeight + 80;
+    }
+
     // ------ Event listeners ------
 
     /** Sets up all event listeners.*/
@@ -340,6 +437,7 @@ public class QueryView {
         last24HoursButton.addActionListener(e -> handleQuickTimeQuery(1, "hours"));
         lastWeekButton.addActionListener(e -> handleQuickTimeQuery(7, "days"));
         lastMonthButton.addActionListener(e -> handleQuickTimeQuery(30, "days"));
+
 
         // Clear results
         clearButton.addActionListener(e -> clearResults());
@@ -361,7 +459,7 @@ public class QueryView {
         try {
             if (extension.isEmpty()) {
                 loadSampleData();
-                showMessage("Showing all sample events", "All Files", JOptionPane.INFORMATION_MESSAGE);
+                showMessage("Showing all events", "All Files", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 if (!extension.startsWith(".")) {
                     extension = "." + extension;
@@ -474,8 +572,7 @@ public class QueryView {
         try {
             // Simulate recent events based on time filter
             LocalDateTime now = LocalDateTime.now();
-            LocalDateTime cutoff = unit.equals("hours") ?
-                    now.minusHours(amount) : now.minusDays(amount);
+            // database interface size - removed unused cutoff variable to clean up warnings
 
             // Load sample data filtered by time
             loadRecentSampleData(amount, unit);
@@ -495,7 +592,9 @@ public class QueryView {
      */
     private void clearResults() {
         tableModel.setRowCount(0);
-        showMessage("Results cleared", "Clear Results", JOptionPane.INFORMATION_MESSAGE);
+        // database interface size - auto-resize after clearing results
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
+        //  showMessage("Results cleared", "Clear Results", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -513,12 +612,12 @@ public class QueryView {
         eventTypeComboBox.setSelectedIndex(0); // Select "ALL"
 
         // Also clear results
-        clearResults();
+       // clearResults();
 
         showMessage("All fields cleared", "Clear Fields", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // ========================= PLACEHOLDER TEXT METHODS =========================
+    // -------- PLACEHOLDER TEXT METHODS --------
 
     /**
      * Sets placeholder text for a JTextField that appears in gray when empty.
@@ -558,7 +657,7 @@ public class QueryView {
         return text;
     }
 
-    // ========================= FILTER METHODS =========================
+    //-------- FILTER METHODS -------
 
     /**
      * Filters table by extension.
@@ -570,6 +669,8 @@ public class QueryView {
                 tableModel.removeRow(i);
             }
         }
+        // database interface size - auto-resize after filtering
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
     }
 
     /**
@@ -582,6 +683,8 @@ public class QueryView {
                 tableModel.removeRow(i);
             }
         }
+        // database interface size - auto-resize after filtering
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
     }
 
     /**
@@ -594,6 +697,8 @@ public class QueryView {
                 tableModel.removeRow(i);
             }
         }
+        // database interface size - auto-resize after filtering
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
     }
 
     /**
@@ -606,9 +711,11 @@ public class QueryView {
                 tableModel.removeRow(i);
             }
         }
+        // database interface size - auto-resize after filtering
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
     }
 
-    // ========================= SAMPLE DATA METHODS =========================
+    // ---------- SAMPLE DATA METHODS ----------
 
     /**
      * Loads sample data for testing.
@@ -622,6 +729,17 @@ public class QueryView {
         tableModel.addRow(new Object[]{6, ".pdf", "paper.pdf", "C:/Documents/research", "ARCHIVED", "2023-10-12 18:45:00"});
         tableModel.addRow(new Object[]{7, ".txt", "report.txt", "C:/Reports", "MODIFIED", "2023-10-16 08:30:00"});
         tableModel.addRow(new Object[]{8, ".java", "Utils.java", "C:/Projects/utils", "CREATED", "2023-10-16 14:20:00"});
+        tableModel.addRow(new Object[]{9, ".txt", "notes.txt", "C:/Documents/work", "CREATED", "2024-9-15 10:15:00"});
+        tableModel.addRow(new Object[]{10, ".java", "Main.java", "C:/Projects/code", "MODIFIED", "2025-6-5 12:30:00"});
+        tableModel.addRow(new Object[]{11, ".html", "index.html", "C:/Websites/home", "DELETED", "2025-5-14 09:00:00"});
+        tableModel.addRow(new Object[]{12, ".css", "styles.css", "C:/Websites/design", "CREATED", "2025-9-14 11:00:00"});
+        tableModel.addRow(new Object[]{13, ".js", "script.js", "C:/Websites/scripts", "ACCESSED", "2024-5-13 14:00:00"});
+        tableModel.addRow(new Object[]{14, ".pdf", "paper.pdf", "C:/Documents/research", "ARCHIVED", "2024-6-1 18:45:00"});
+        tableModel.addRow(new Object[]{15, ".txt", "report.txt", "C:/Reports", "MODIFIED", "2024-8-20 08:30:00"});
+        tableModel.addRow(new Object[]{16, ".java", "Utils.java", "C:/Projects/utils", "CREATED", "2024-3-8 14:20:00"});
+
+        // database interface size - auto-resize after loading data
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
     }
 
     /**
@@ -640,6 +758,9 @@ public class QueryView {
             tableModel.addRow(new Object[]{1, ".pdf", "report.pdf", "C:/Documents", "CREATED", "2023-10-13 16:45:00"});
             tableModel.addRow(new Object[]{2, ".pdf", "manual.pdf", "C:/Docs", "ACCESSED", "2023-10-14 10:20:00"});
         }
+
+        // database interface size - auto-resize after filtering sample data
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
     }
 
     /**
@@ -651,6 +772,9 @@ public class QueryView {
             tableModel.addRow(new Object[]{2, ".pdf", "report.pdf", "C:/Reports", "MODIFIED", "2023-10-15 15:30:00"});
             tableModel.addRow(new Object[]{3, ".java", "NewClass.java", "C:/Code", "CREATED", "2023-10-15 09:15:00"});
         }
+
+        // database interface size - auto-resize after date filtering
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
     }
 
     /**
@@ -663,9 +787,12 @@ public class QueryView {
         tableModel.addRow(new Object[]{1, ".txt", "recent_file.txt", "C:/Temp", "CREATED", timeStr});
         tableModel.addRow(new Object[]{2, ".log", "app.log", "C:/Logs", "MODIFIED", timeStr});
         tableModel.addRow(new Object[]{3, ".java", "CurrentWork.java", "C:/Projects", "MODIFIED", timeStr});
+
+        // database interface size - auto-resize after loading recent data
+        SwingUtilities.invokeLater(this::autoResizeQueryDialog);
     }
 
-    // ========================= UTILITY METHODS =========================
+    //-------- UTILITY METHODS -------
 
     /**
      * Checks if no results and shows appropriate message.
@@ -694,11 +821,17 @@ public class QueryView {
      * Finalizes the dialog setup and shows it.
      */
     private void finalizeDialog() {
-        queryDialog.pack();
-        queryDialog.setSize(Math.max(1000, watcherView.mainFrame.getSize().width),
-                Math.max(700, watcherView.mainFrame.getSize().height * 2/3));
+        // database interface size - calculate optimal size before showing
+        autoResizeQueryDialog();
+
+        // database interface size - set minimum size to ensure usability
         queryDialog.setMinimumSize(new Dimension(1000, 700));
+
+        // database interface size - position dialog relative to parent
         queryDialog.setLocationRelativeTo(watcherView.mainFrame);
+
         queryDialog.setVisible(true);
+
+        System.out.println("Query dialog finalized with auto-resize capabilities");
     }
 }
